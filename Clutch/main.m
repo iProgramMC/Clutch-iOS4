@@ -137,40 +137,60 @@ int main(int argc, const char *argv[]) {
                     }
                     case ClutchCommandOptionBinaryDump:
                     case ClutchCommandOptionDump: {
+						KJPrint(@"%s line %d", __func__, __LINE__);
                         NSDictionary *_installedApps = [[[KJApplicationManager alloc] init] cachedApplications];
+						KJPrint(@"%s line %d", __func__, __LINE__);
                         NSArray *_installedArray = _installedApps.allValues;
+						KJPrint(@"%s line %d", __func__, __LINE__);
 
                         for (NSString *selection in values) {
+							KJPrint(@"%s line %d.", __func__, __LINE__);
+							KJPrint(@"%s line %d. %@", __func__, __LINE__, selection);
                             NSUInteger key;
                             Application *_selectedApp;
+							
+							//BOOL isNumber = !(key = (NSUInteger)selection.integerValue);
+							BOOL isNumber = NO;// TODO: restore number functionality
 
-                            if (!(key = (NSUInteger)selection.integerValue)) {
+							KJPrint(@"%s line %d", __func__, __LINE__);
+							KJPrint(@"%s line %d %@", __func__, __LINE__, selection);
+                            if (!isNumber) {
+								KJPrint(@"%s line %d", __func__, __LINE__);
                                 KJDebug(@"using bundle identifier");
                                 if ([_installedApps objectForKey:selection] == nil) {
+									KJPrint(@"%s line %d", __func__, __LINE__);
                                     KJPrint(@"Couldn't find installed app with bundle identifier: %@",
-                                            _selectedBundleID);
+                                            selection);
                                     return 1;
                                 } else {
+									KJPrint(@"%s line %d", __func__, __LINE__);
                                     _selectedApp = [_installedApps objectForKey:selection];
                                 }
                             } else {
+								KJPrint(@"%s line %d", __func__, __LINE__);
                                 KJDebug(@"using number");
                                 key = key - 1;
 
+								KJPrint(@"%s line %d", __func__, __LINE__);
                                 if (key > _installedArray.count) {
+									KJPrint(@"%s line %d", __func__, __LINE__);
                                     KJPrint(@"Couldn't find app with corresponding number!?!");
                                     return 1;
                                 }
+								KJPrint(@"%s line %d", __func__, __LINE__);
                                 _selectedApp = [_installedArray objectAtIndex:key];
                             }
 
+							KJPrint(@"%s line %d", __func__, __LINE__);
                             if (!_selectedApp) {
                                 KJPrint(@"Couldn't find installed app");
                                 return 1;
                             }
 
+							KJPrint(@"%s line %d", __func__, __LINE__);
                             KJPrintVerbose(@"Now dumping %@", _selectedApp.bundleIdentifier);
 
+							KJPrint(@"%s line %d", __func__, __LINE__);
                             if (_selectedApp.hasAppleWatchApp) {
                                 KJPrint(@"%@ contains watchOS 2 compatible application. It's not possible to dump "
                                         @"watchOS 2 apps with Clutch %@ at this moment.",
@@ -178,11 +198,14 @@ int main(int argc, const char *argv[]) {
                                         CLUTCH_VERSION);
                             }
 
+							KJPrint(@"%s line %d", __func__, __LINE__);
                             gettimeofday(&gStart, NULL);
+							KJPrint(@"%s line %d", __func__, __LINE__);
                             if (![_selectedApp dumpToDirectoryURL:nil
                                                      onlyBinaries:[_selectedOption isEqualToString:@"binary-dump"]]) {
                                 return 1;
                             }
+							KJPrint(@"%s line %d", __func__, __LINE__);
                         }
                         break;
                     }

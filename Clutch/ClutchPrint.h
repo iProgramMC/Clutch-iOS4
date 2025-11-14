@@ -18,10 +18,10 @@ typedef NS_ENUM(NSUInteger, KJPrintLogLevel) {
 
 NSInteger KJPrint(NSString *format, ...);
 NSInteger KJPrintVerbose(NSString *format, ...);
-#if defined(DEBUG) && DEBUG
+//#if defined(DEBUG) && DEBUG
 NSInteger KJDebug(NSString *format, ...);
-#else
-#define KJDebug(x...)
-#endif
+//#else
+//#define KJDebug(x...)
+//#endif
 
 NS_ASSUME_NONNULL_END

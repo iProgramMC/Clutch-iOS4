@@ -10,6 +10,7 @@
 #define dumpedAppPath @"/etc/dumped.clutch"
 
 #import "KJApplicationManager.h"
+#import "ClutchPrint.h"
 #import <dlfcn.h>
 
 typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
@@ -43,6 +44,7 @@ typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
     if (MIHandle) {
         mobileInstallationLookup = (MobileInstallationLookup)dlsym(MIHandle, "MobileInstallationLookup");
         if (mobileInstallationLookup) {
+			KJPrint(@"MobileInstallationLookup found.  Calling it.");
 
             NSDictionary *installedApps;
             NSDictionary *options = @{
@@ -59,6 +61,7 @@ typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
 
             installedApps = mobileInstallationLookup(options);
 
+			KJPrint(@"MobileInstallationLookup called.  Entry Count: %d.", [options count]);
             for (NSString *bundleID in installedApps.allKeys) {
                 NSDictionary *appI = [installedApps objectForKey:bundleID];
                 NSURL *bundleURL = [NSURL fileURLWithPath:[appI objectForKey:@"Path"]];
@@ -67,6 +70,8 @@ typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
                 BOOL isDirectory;
                 BOOL purchased = [[NSFileManager defaultManager] fileExistsAtPath:scinfo isDirectory:&isDirectory];
 
+				purchased = YES; // HACK
+				isDirectory = YES; // HACK
                 if (purchased && isDirectory) {
                     NSString *name = [appI objectForKey:@"CFBundleDisplayName"];
                     if (name == nil) {
@@ -83,10 +88,26 @@ typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
                     [returnValue setObject:app forKey:bundleID];
 
                     [self cacheBundle:bundleInfo];
+					
+					KJPrint(@"Found: %@.  Purchased: %d, IsDirectory: %d, BundleContainer: %@, BundleURL: %@, DisplayName: %@, BundleIdentifier: %@",
+						bundleID,
+						purchased,
+						isDirectory,
+						bundleURL.URLByDeletingLastPathComponent,
+						bundleURL,
+						name,
+						bundleID
+					);
                 }
             }
         }
+		else {
+			KJPrint(@"KJApplicationManager: MobileInstallationLookup not found in MobileInstallation.framework!");
+		}
     }
+	else {
+		KJPrint(@"KJApplicationManager: MobileInstallation.framework not found!");
+	}
 
     [self writeToCache];
 

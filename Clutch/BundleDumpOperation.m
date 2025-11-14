@@ -89,9 +89,9 @@
         return;
     }
 
-    self.completionBlock = ^{
+    /*self.completionBlock = ^{
 
-    };
+    };*/
 
     // If the operation is not canceled, begin executing the task.
     [self willChangeValueForKey:@"isExecuting"];

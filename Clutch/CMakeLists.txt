@@ -169,12 +169,8 @@ add_custom_command(
   TARGET Clutch POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/build"
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Clutch>
-          "${CMAKE_BINARY_DIR}/build/")
-#add_custom_command(
-#  TARGET Clutch POST_BUILD
-#  COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/build"
-#  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Clutch>
-#          "${CMAKE_BINARY_DIR}/build/"
-#  COMMAND codesign -fs-
-#          --entitlements "${CMAKE_CURRENT_BINARY_DIR}/Clutch.entitlements"
-#                         "${CMAKE_BINARY_DIR}/build/Clutch")
+          "${CMAKE_BINARY_DIR}/build/"
+  COMMAND CODESIGN_ALLOCATE=$ENV{THEOS}/toolchain/linux/iphone/bin/codesign_allocate
+          $ENV{THEOS}/toolchain/linux/iphone/bin/ldid
+          -S"${CMAKE_CURRENT_BINARY_DIR}/Clutch.entitlements"
+            "${CMAKE_BINARY_DIR}/build/Clutch")

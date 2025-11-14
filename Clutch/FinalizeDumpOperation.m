@@ -69,13 +69,13 @@ extern struct timeval gStart;
     }
 
     NSString *__unsafe_unretained bundleIdentifier = _application.bundleIdentifier;
-    self.completionBlock = ^{
+    /*self.completionBlock = ^{
         struct timeval end;
         gettimeofday(&end, NULL);
         NSInteger dif = diff_ms(end, gStart);
         CGFloat sec = ((dif + 500.0f) / 1000.0f);
         KJPrint(@"Finished dumping %@ in %0.1f seconds", bundleIdentifier, sec);
-    };
+    };*/
 
     // If the operation is not canceled, begin executing the task.
     [self willChangeValueForKey:@"isExecuting"];

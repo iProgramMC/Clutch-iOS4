@@ -8,7 +8,7 @@
 
 #import "ClutchPrint.h"
 
-NSUInteger KJPrintCurrentLogLevel = KJPrintLogLevelNormal;
+NSUInteger KJPrintCurrentLogLevel = KJPrintLogLevelDebug;
 
 static NSInteger KJPrintv(NSString *format, va_list ap) {
     if (![format hasSuffix:@"\n"]) {
@@ -37,7 +37,7 @@ NSInteger KJPrintVerbose(NSString *format, ...) {
     return ret;
 }
 
-#if defined(DEBUG) && DEBUG
+//#if defined(DEBUG) && DEBUG
 NSInteger KJDebug(NSString *format, ...) {
     if (KJPrintCurrentLogLevel < KJPrintLogLevelDebug) {
         return 0;
@@ -48,4 +48,4 @@ NSInteger KJDebug(NSString *format, ...) {
     va_end(ap);
     return ret;
 }
-#endif
+//#endif
