@@ -16,7 +16,8 @@
 
 #include <fenv.h>
 
-@import ObjectiveC.runtime;
+#import <objc/runtime.h>
+//@import ObjectiveC.runtime;
 
 @interface BundleDumpOperation () {
     ClutchBundle *_application;
@@ -80,7 +81,7 @@
 
 - (void)start {
     // Always check for cancellation before launching the task.
-    if (self.cancelled) {
+    if ([self isCancelled]) {
         // Must move the operation to the finished state if it is canceled.
         [self willChangeValueForKey:@"isFinished"];
         _finished = YES;
@@ -266,7 +267,7 @@
             offset = sizeof(struct fat_header);
 
             for (NSUInteger i = 0, macho_offset = 0; i < _headersToKeep.count; i++) {
-                NSValue *archValue = _headersToKeep[i];
+                NSValue *archValue = [_headersToKeep objectAtIndex:i];
                 struct fat_arch keepArch;
                 [archValue getValue:&keepArch];
                 KJDebug(@"headers to keep: %u %u", (uint32_t)SWAP(keepArch.cpusubtype), SWAP(keepArch.cputype));

@@ -52,7 +52,7 @@
     NSString *_fallbackFolderName;
     _Bool _installing;
     _Bool _uninstalling;
-    NSObject<OS_dispatch_queue> *_workQueue;
+    dispatch_queue_t _workQueue;
 }
 
 @property (nonatomic, getter=_isUninstalling, setter=_setUninstalling:)

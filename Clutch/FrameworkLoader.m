@@ -19,7 +19,7 @@
 #import <mach/mach_init.h>
 #import <mach/mach_traps.h>
 
-@import ObjectiveC.runtime;
+#import <objc/runtime.h> // @import ObjectiveC.runtime;
 
 @interface FrameworkLoader () {
     uint32_t _dyldImageIndex;
@@ -44,7 +44,7 @@
 
     [NSBundle mainBundle].clutchBID = self.bID; //_infoPlist[@"CFBundleIdentifier"];
 
-    self.originalBinary = (Binary *)[NSString stringWithFormat:@"<%@>", _infoPlist[@"CFBundleExecutable"]];
+    self.originalBinary = (Binary *)[NSString stringWithFormat:@"<%@>", [_infoPlist objectForKey:@"CFBundleExecutable"]];
 
     NSFileHandle *newFileHandle =
         [[NSFileHandle alloc] initWithFileDescriptor:fileno(fopen(binaryDumpPath.UTF8String, "r+"))];
@@ -152,15 +152,7 @@
     NSData *data;
 
     if (image_header->cputype == CPU_TYPE_ARM64) {
-        struct encryption_info_command_64 crypt;
-
-        [fileHandle getBytes:&crypt atOffset:self.cryptlc_offset length:sizeof(struct encryption_info_command_64)];
-
-        KJDebug(@"current cryptid %u", crypt.cryptid);
-        crypt.cryptid = 0;
-        [fileHandle seekToFileOffset:self.cryptlc_offset];
-
-        data = [NSData dataWithBytes:&crypt length:sizeof(struct encryption_info_command_64)];
+		KJPrint(@"ARM64 decryption not supported");
 
     } else {
         struct encryption_info_command crypt;

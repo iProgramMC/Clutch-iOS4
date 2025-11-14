@@ -89,19 +89,13 @@
         }
 
         if (!_application.parentBundle &&
-            [fm fileExistsAtPath:[_application.bundleContainerURL URLByAppendingPathComponent:@"iTunesArtwork"
-                                                                                  isDirectory:NO]
-                                     .path]) {
-            [_archive addFileToZip:[_application.bundleContainerURL URLByAppendingPathComponent:@"iTunesArtwork"
-                                                                                    isDirectory:NO]
-                                       .path
+            [fm fileExistsAtPath:[[_application.bundleContainerURL path] stringByAppendingPathComponent:@"iTunesArtwork"]]) {
+            [_archive addFileToZip:[[_application.bundleContainerURL path] stringByAppendingPathComponent:@"iTunesArtwork"]
                            newname:@"iTunesArtwork"];
         }
 
         if (!_application.parentBundle &&
-            [fm fileExistsAtPath:[_application.bundleContainerURL URLByAppendingPathComponent:@"iTunesMetadata.plist"
-                                                                                  isDirectory:NO]
-                                     .path]) {
+            [fm fileExistsAtPath:[[_application.bundleContainerURL path] stringByAppendingPathComponent:@"iTunesMetadata.plist"]]) {
 
             // skip iTunesMetadata
             // [_archive addFileToZip:[_application.bundleContainerURL
@@ -128,9 +122,9 @@
             NSArray *_pathComponents = _localPath.pathComponents;
 
             if (_pathComponents.count > 2) {
-                if ([_pathComponents[2] isEqualToString:@"SC_Info"] || [_pathComponents[2] isEqualToString:@"Watch"] ||
-                    [_pathComponents[2] isEqualToString:@"Frameworks"] ||
-                    [_pathComponents[2] isEqualToString:@"PlugIns"]) {
+                if ([[_pathComponents objectAtIndex:2] isEqualToString:@"SC_Info"] || [[_pathComponents objectAtIndex:2] isEqualToString:@"Watch"] ||
+                    [[_pathComponents objectAtIndex:2] isEqualToString:@"Frameworks"] ||
+                    [[_pathComponents objectAtIndex:2] isEqualToString:@"PlugIns"]) {
                     if ([_localPath.lastPathComponent hasPrefix:@"libswift"] &&
                         ![_localPath.pathExtension caseInsensitiveCompare:@"dylib"]) {
                         [_archive addFileToZip:theURL.path
@@ -140,7 +134,7 @@
                         KJDebug(@"Skipping %@", [_localPrefix stringByAppendingPathComponent:_localPath]);
                     }
                 } else if (!isDirectory.boolValue &&
-                           ![_pathComponents[2] isEqualToString:_application.executablePath.lastPathComponent]) {
+                           ![[_pathComponents objectAtIndex:2] isEqualToString:_application.executablePath.lastPathComponent]) {
                     [_archive addFileToZip:theURL.path
                                    newname:[_localPrefix stringByAppendingPathComponent:_localPath]];
                     KJDebug(@"Added %@", [_localPrefix stringByAppendingPathComponent:_localPath]);

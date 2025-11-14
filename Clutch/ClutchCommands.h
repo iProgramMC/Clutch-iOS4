@@ -5,6 +5,7 @@
 //  Created by dev on 10/01/2017.
 //
 //
+#include "Hack.h"
 
 typedef NS_OPTIONS(NSInteger, ClutchCommandFlag) {
     ClutchCommandFlagNone = 0,
@@ -40,11 +41,11 @@ typedef NS_ENUM(NSUInteger, ClutchCommandOption) {
 
 @interface ClutchCommands : NSObject
 
-@property (nonatomic, retain, readonly) NSArray<ClutchCommand *> *allCommands;
-@property (nonatomic, retain, readonly) NSArray<ClutchCommand *> *commands;
+@property (nonatomic, retain, readonly) NSArray *allCommands;
+@property (nonatomic, retain, readonly) NSArray *commands;
 @property (nonatomic, retain, readonly) NSString *helpString;
-@property (nonatomic, retain, readonly) NSArray<NSString *> *values;
+@property (nonatomic, retain, readonly) NSArray *values;
 
-- (instancetype)initWithArguments:(NSArray<NSString *> *)arguments;
+- (instancetype)initWithArguments:(NSArray *)arguments;
 
 @end

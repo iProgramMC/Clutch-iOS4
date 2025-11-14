@@ -8,6 +8,7 @@
  //  @copyright Copyright 2008  Inc. All rights reserved.
  //
  */
+#include "Hack.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

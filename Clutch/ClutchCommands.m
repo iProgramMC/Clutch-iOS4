@@ -58,7 +58,7 @@
 
 @implementation ClutchCommands
 
-- (instancetype)initWithArguments:(NSArray<NSString *> *)arguments {
+- (instancetype)initWithArguments:(NSArray *)arguments {
     if ((self = [super self])) {
         _allCommands = [self buildCommands];
         _commands = [self parseCommandWithArguments:arguments];
@@ -68,21 +68,21 @@
     return self;
 }
 
-- (NSArray<ClutchCommand *> *)parseCommandWithArguments:(NSArray<NSString *> *)arguments {
-    NSMutableArray<ClutchCommand *> *returnCommands = [NSMutableArray new];
-    NSMutableArray<NSString *> *returnValues = [NSMutableArray new];
+- (NSArray *)parseCommandWithArguments:(NSArray *)arguments {
+    NSMutableArray *returnCommands = [NSMutableArray new];
+    NSMutableArray *returnValues = [NSMutableArray new];
     BOOL commandFound = NO;
 
     for (NSString *argument in arguments) {
-        if ([argument isEqualToString:arguments[0]]) {
+        if ([argument isEqualToString:[arguments objectAtIndex:0]]) {
             continue;
         } else if ([argument isEqualToString:@"--no-color"]) {
             // Optionals
-            [returnCommands insertObject:self.allCommands[8] atIndex:0];
+            [returnCommands insertObject:[self.allCommands objectAtIndex:8] atIndex:0];
         } else if ([argument isEqualToString:@"--verbose"]) {
-            [returnCommands insertObject:self.allCommands[9] atIndex:0];
+            [returnCommands insertObject:[self.allCommands objectAtIndex:9] atIndex:0];
         } else if ([argument isEqualToString:@"--debug"]) {
-            [returnCommands insertObject:self.allCommands[10] atIndex:0];
+            [returnCommands insertObject:[self.allCommands objectAtIndex:10] atIndex:0];
         } else if ([argument hasPrefix:@"-"]) {
             // is a flag
             for (ClutchCommand *command in self.allCommands) {
@@ -104,7 +104,7 @@
     }
 
     if (returnCommands.count < 1) {
-        return @[ self.allCommands[0] ];
+        return @[ [self.allCommands objectAtIndex:0] ];
     }
 
     _values = returnValues;
@@ -112,7 +112,7 @@
     return returnCommands;
 }
 
-- (NSArray<ClutchCommand *> *)buildCommands {
+- (NSArray *)buildCommands {
     ClutchCommand *none =
         [ClutchCommand commandWithCommandOption:ClutchCommandOptionNone
                                     shortOption:nil
@@ -182,7 +182,7 @@
         }
     }
 
-    return self.commands[0]; // return ClutchCommand None
+    return [self.commands objectAtIndex:0]; // return ClutchCommand None
 }
 
 - (NSString *)buildHelpString {

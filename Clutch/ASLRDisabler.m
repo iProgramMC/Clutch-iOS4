@@ -15,7 +15,7 @@
 #import <mach/mach_traps.h>
 #import <mach/vm_map.h>
 
-@import MachO.loader;
+#include <mach-o/loader.h> // @import MachO.loader;
 
 @implementation ASLRDisabler
 
@@ -24,7 +24,7 @@
     kern_return_t kr = 0;
     if (task_for_pid(mach_task_self(), pid, &targetTask)) {
         KJPrint(@"Can't execute task_for_pid! Do you have the right permissions/entitlements?");
-        NSDictionary<NSErrorUserInfoKey, NSString *> *userInfo = @{
+        NSDictionary *userInfo = @{
             NSLocalizedDescriptionKey : @"Failed to execute task_for_pid",
         };
         if (error) {
@@ -64,7 +64,7 @@
         iter = addr + lsize;
     }
 
-    NSDictionary<NSErrorUserInfoKey, NSString *> *userInfo = @{
+    NSDictionary *userInfo = @{
         NSLocalizedDescriptionKey : @"Should not reach here",
     };
     if (error) {

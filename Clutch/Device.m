@@ -12,7 +12,7 @@
 #import <mach-o/dyld.h>
 #import <mach/machine.h>
 
-@import MachO.loader;
+#import <mach-o/loader.h> // @import MachO.loader;
 
 @implementation Device
 

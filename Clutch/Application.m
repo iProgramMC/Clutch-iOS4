@@ -13,9 +13,10 @@
 #import "FinalizeDumpOperation.h"
 #import "SCInfoBuilder.h"
 #import "ZipOperation.h"
+#import "UUIDGenerator.h"
 
 @interface Application () {
-    NSUUID *_workingUUID;
+    NSString *_workingUUIDString;
     NSMutableArray *_frameworks;
     NSMutableArray *_extensions;
     NSMutableArray *_watchOSApps;
@@ -28,9 +29,9 @@
 - (instancetype)initWithBundleInfo:(NSDictionary *)info {
     if (self = [super initWithBundleInfo:info]) {
 
-        _workingUUID = [NSUUID new];
+        _workingUUIDString = [UUIDGenerator createUUID];
         _workingPath = [NSTemporaryDirectory()
-            stringByAppendingPathComponent:[@"clutch" stringByAppendingPathComponent:_workingUUID.UUIDString]];
+            stringByAppendingPathComponent:[@"clutch" stringByAppendingPathComponent:_workingUUIDString]];
 
         [self reloadFrameworksInfo];
         [self reloadPluginsInfo];
@@ -58,8 +59,8 @@
 }
 
 - (BOOL)isAppleWatchApp {
-    if ([self.infoDictionary[@"CFBundleSupportedPlatforms"] containsObject:@"WatchOS"] ||
-        [self.infoDictionary[@"DTPlatformName"] isEqualToString:@"watchos"])
+    if ([[self.infoDictionary objectForKey:@"CFBundleSupportedPlatforms"] containsObject:@"WatchOS"] ||
+        [[self.infoDictionary objectForKey:@"DTPlatformName"] isEqualToString:@"watchos"])
         return YES;
 
     return NO;
@@ -205,7 +206,7 @@
 
     [_finalizeDumpOperation addDependency:_dumpOperation];
 
-    NSMutableArray *_additionalDumpOpeartions = ({
+    NSMutableArray *_additionalDumpOpeartions = ({ // sic
         NSMutableArray *array = [NSMutableArray new];
 
 #ifdef DEBUG
@@ -229,7 +230,7 @@
 
     _finalizeDumpOperation.expectedBinariesCount = _additionalDumpOpeartions.count + 1;
 
-    NSMutableArray *_additionalZipOpeartions = ({
+    NSMutableArray *_additionalZipOpeartions = ({ // sic
         NSMutableArray *array = [NSMutableArray new];
 
 #ifdef DEBUG
@@ -263,8 +264,8 @@
         [_additionalZipOpeartions removeAllObjects];
 
     for (unsigned int i = 1; i < _additionalZipOpeartions.count; i++) {
-        ZipOperation *_zipOperation = _additionalZipOpeartions[i];
-        [_zipOperation addDependency:_additionalZipOpeartions[i - 1]];
+        ZipOperation *_zipOperation = [_additionalZipOpeartions objectAtIndex:i];
+        [_zipOperation addDependency:[_additionalZipOpeartions objectAtIndex:i - 1]];
     }
 
     for (NSOperation *operation in _additionalDumpOpeartions) {
@@ -314,7 +315,7 @@
 - (NSString *)zipFilename {
     return [NSString stringWithFormat:@"%@-iOS%@-(Clutch-%@).ipa",
                                       self.bundleIdentifier,
-                                      self.infoDictionary[@"MinimumOSVersion"],
+                                      [self.infoDictionary objectForKey:@"MinimumOSVersion"],
                                       CLUTCH_VERSION];
 }
 

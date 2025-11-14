@@ -117,7 +117,7 @@
 
     NSDictionary *attr = [[NSFileManager defaultManager] attributesOfItemAtPath:file error:nil];
     if (attr) {
-        NSDate *fileDate = (NSDate *)attr[NSFileModificationDate];
+        NSDate *fileDate = (NSDate *)[attr objectForKey:NSFileModificationDate];
         if (fileDate) {
             // some application does use dosDate, but tmz_date instead
             //    zipInfo.dosDate = [fileDate timeIntervalSinceDate:[self Date1980] ];
@@ -134,7 +134,7 @@
             zipInfo.tmz_date.tm_year = (uInt)dc.year;
         }
 
-        NSNumber *permissionsValue = (NSNumber *)attr[NSFilePosixPermissions];
+        NSNumber *permissionsValue = (NSNumber *)[attr objectForKey:NSFilePosixPermissions];
         if (permissionsValue.boolValue) {
             short permissionsShort = permissionsValue.shortValue;
             // Convert this into an octal by adding 010000, 010000 being the flag for a regular file
@@ -196,7 +196,7 @@
         return NO;
 
     fseek(f, 0, SEEK_END);
-    long fLenght = ftell(f);
+    long fLenght = ftell(f); //sic
     rewind(f);
     void *fBuffer = malloc(M_FRAGMENT_SIZE);
 
@@ -248,15 +248,15 @@
     NSDate *fileDate = nil;
 
     if (attr)
-        fileDate = (NSDate *)attr[NSFileModificationDate];
+        fileDate = (NSDate *)[attr objectForKey:NSFileModificationDate];
 
     if (fileDate == nil)
         fileDate = [NSDate date];
 
-    NSCalendar *gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSCalendar *gregorianCalendar = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
     NSDateComponents *components =
-        [gregorianCalendar components:NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay |
-                                      NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond
+        [gregorianCalendar components:kCFCalendarUnitYear | kCFCalendarUnitMonth | kCFCalendarUnitDay |
+                                      kCFCalendarUnitHour | kCFCalendarUnitMinute | kCFCalendarUnitSecond
                              fromDate:fileDate];
 
     zipInfo.tmz_date.tm_sec = (uInt)components.second;
@@ -478,7 +478,7 @@
                     components.year = (NSInteger)fileInfo.tmu_date.tm_year;
 
                     NSCalendar *gregorianCalendar =
-                        [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+                        [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
                     NSDate *orgDate = [gregorianCalendar dateFromComponents:components];
 
                     NSDictionary *attr = @{
@@ -578,7 +578,7 @@
 
             if (fileMutableData.length > 0) {
                 NSData *fileData = [NSData dataWithData:fileMutableData];
-                fileDictionary[strPath] = fileData;
+                [fileDictionary setObject:fileData forKey:strPath];
             }
 
             if (ret == UNZ_OK) {
@@ -707,7 +707,7 @@
     comps.day = 1;
     comps.month = 1;
     comps.year = 1980;
-    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
     NSDate *date = [gregorian dateFromComponents:comps];
 
     return date;

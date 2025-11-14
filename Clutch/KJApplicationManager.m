@@ -10,9 +10,6 @@
 #define dumpedAppPath @"/etc/dumped.clutch"
 
 #import "KJApplicationManager.h"
-#import "FBApplicationInfo.h"
-#import "LSApplicationProxy.h"
-#import "LSApplicationWorkspace.h"
 #import <dlfcn.h>
 
 typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
@@ -63,17 +60,17 @@ typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
             installedApps = mobileInstallationLookup(options);
 
             for (NSString *bundleID in installedApps.allKeys) {
-                NSDictionary *appI = installedApps[bundleID];
-                NSURL *bundleURL = [NSURL fileURLWithPath:appI[@"Path"]];
+                NSDictionary *appI = [installedApps objectForKey:bundleID];
+                NSURL *bundleURL = [NSURL fileURLWithPath:[appI objectForKey:@"Path"]];
                 NSString *scinfo = [bundleURL.path stringByAppendingPathComponent:@"SC_Info"];
 
                 BOOL isDirectory;
                 BOOL purchased = [[NSFileManager defaultManager] fileExistsAtPath:scinfo isDirectory:&isDirectory];
 
                 if (purchased && isDirectory) {
-                    NSString *name = appI[@"CFBundleDisplayName"];
+                    NSString *name = [appI objectForKey:@"CFBundleDisplayName"];
                     if (name == nil) {
-                        name = appI[@"CFBundleExecutable"];
+                        name = [appI objectForKey:@"CFBundleExecutable"];
                     }
 
                     NSDictionary *bundleInfo = @{
@@ -83,7 +80,7 @@ typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
                         @"BundleIdentifier" : bundleID
                     };
                     Application *app = [[Application alloc] initWithBundleInfo:bundleInfo];
-                    returnValue[bundleID] = app;
+                    [returnValue setObject:app forKey:bundleID];
 
                     [self cacheBundle:bundleInfo];
                 }
@@ -96,51 +93,8 @@ typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
     return returnValue;
 }
 
-- (NSDictionary *)listApplicationsForiOS8AndHigher {
-    NSMutableDictionary *returnValue = [NSMutableDictionary new];
-    LSApplicationWorkspace *applicationWorkspace = [LSApplicationWorkspace defaultWorkspace];
-
-    NSArray *proxies = [applicationWorkspace allApplications];
-    NSDictionary *bundleInfo = nil;
-
-    for (FBApplicationInfo *proxy in proxies) {
-        NSString *appType = [proxy performSelector:@selector(applicationType)];
-
-        if ([appType isEqualToString:@"User"] && proxy.bundleContainerURL && proxy.bundleURL) {
-            NSString *scinfo = [proxy.bundleURL.path stringByAppendingPathComponent:@"SC_Info"];
-
-            BOOL isDirectory;
-            BOOL purchased = [[NSFileManager defaultManager] fileExistsAtPath:scinfo isDirectory:&isDirectory];
-
-            if (purchased && isDirectory) {
-                NSString *itemName = ((LSApplicationProxy *)proxy).itemName;
-
-                if (!itemName) {
-                    itemName = ((LSApplicationProxy *)proxy).localizedName;
-                }
-
-                bundleInfo = @{
-                    @"BundleContainer" : proxy.bundleContainerURL,
-                    @"BundleURL" : proxy.bundleURL,
-                    @"DisplayName" : itemName,
-                    @"BundleIdentifier" : proxy.bundleIdentifier
-                };
-
-                Application *app = [[Application alloc] initWithBundleInfo:bundleInfo];
-                returnValue[proxy.bundleIdentifier] = app;
-
-                [self cacheBundle:bundleInfo];
-            }
-        }
-    }
-
-    [self writeToCache];
-
-    return returnValue.copy;
-}
-
 - (void)writeToCache {
-    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0);
     dispatch_async(queue, ^{
         [self.cachedApps writeToFile:applistCachePath atomically:YES];
     });
@@ -148,12 +102,7 @@ typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
 
 - (NSDictionary *)_allApplications {
     NSDictionary *returnValue;
-    if (SYSTEM_VERSION_LESS_THAN_OR_EQUAL_TO(NSFoundationVersionNumber_iOS_7_0)) {
-        returnValue = [self listApplicationsForiOS7AndLower];
-    } else {
-        returnValue = [self listApplicationsForiOS8AndHigher];
-    }
-
+    returnValue = [self listApplicationsForiOS7AndLower];
     return returnValue.copy;
 }
 
@@ -169,7 +118,7 @@ typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
     NSMutableDictionary *returnValue = [NSMutableDictionary new];
     for (NSDictionary *bundleInfo in _cachedApps) {
         Application *app = [[Application alloc] initWithBundleInfo:bundleInfo];
-        returnValue[bundleInfo[@"BundleIdentifier"]] = app;
+        [returnValue setObject:app forKey:[bundleInfo objectForKey:@"BundleIdentifier"]];
     }
 
     return returnValue;
@@ -187,8 +136,8 @@ typedef NSDictionary *(*MobileInstallationLookup)(NSDictionary *options);
     NSMutableArray *paths = [NSMutableArray new];
 
     for (NSUInteger i = 0; i < array.count; i++) {
-        if (![[array[i] pathExtension] caseInsensitiveCompare:@"ipa"]) {
-            [paths addObject:array[i]];
+        if (![[[array objectAtIndex:i] pathExtension] caseInsensitiveCompare:@"ipa"]) {
+            [paths addObject:[array objectAtIndex:i]];
         }
     }
 

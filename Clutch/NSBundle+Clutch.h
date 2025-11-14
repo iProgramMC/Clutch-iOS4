@@ -5,6 +5,7 @@
 //  Created by Anton Titkov on 20.04.15.
 //
 //
+#include "Hack.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

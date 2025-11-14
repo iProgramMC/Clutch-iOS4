@@ -5,7 +5,7 @@
 //  Created by Anton Titkov on 22.03.15.
 //
 //
-
+#include "Hack.h"
 #import "NSFileHandle+Private.h"
 #import "optool.h"
 #import <mach/machine.h>

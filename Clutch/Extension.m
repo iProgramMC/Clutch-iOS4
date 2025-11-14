@@ -17,7 +17,7 @@
 }
 
 - (BOOL)isWatchKitExtension {
-    return [self.infoDictionary[@"NSExtension"][@"NSExtensionPointIdentifier"] isEqualToString:@"com.apple.watchkit"];
+    return [[[self.infoDictionary objectForKey:@"NSExtension"] objectForKey:@"NSExtensionPointIdentifier"] isEqualToString:@"com.apple.watchkit"];
 }
 
 - (NSString *)zipFilename {

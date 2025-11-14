@@ -293,11 +293,11 @@
                     struct encryption_info_command *newcrypt = (struct encryption_info_command *)curloc;
                     newcrypt->cryptid = 0; // change the cryptid to 0
                     KJPrint(@"Patched cryptid (32bit segment)");
-                } else if (l_cmd->cmd == LC_ENCRYPTION_INFO_64) {
+                }/* else if (l_cmd->cmd == LC_ENCRYPTION_INFO_64) {
                     struct encryption_info_command_64 *newcrypt = (struct encryption_info_command_64 *)curloc;
                     newcrypt->cryptid = 0; // change the cryptid to 0
                     KJPrint(@"Patched cryptid (64bit segment)");
-                }
+                }*/
 
                 curloc += lcmd_size;
                 if (curloc >= buf + 0x1000) {

@@ -9,6 +9,7 @@
 #import "FrameworkDumper.h"
 #import "ClutchPrint.h"
 #import "Device.h"
+#import "UUIDGenerator.h"
 #import <spawn.h>
 
 @implementation FrameworkDumper
@@ -171,14 +172,15 @@
 
     pid_t pid;
 
-    NSUUID *workingUUID = [NSUUID new];
+	NSString *workingUUIDString = [UUIDGenerator createUUID];
+
     NSString *workingPath = [NSTemporaryDirectory()
-        stringByAppendingPathComponent:[@"clutch" stringByAppendingPathComponent:workingUUID.UUIDString]];
+        stringByAppendingPathComponent:[@"clutch" stringByAppendingPathComponent:workingUUIDString]];
 
     while ([[NSFileManager defaultManager] fileExistsAtPath:workingPath]) {
-        workingUUID = [NSUUID new];
+		workingUUIDString = [UUIDGenerator createUUID];
         workingPath = [NSTemporaryDirectory()
-            stringByAppendingPathComponent:[@"clutch" stringByAppendingPathComponent:workingUUID.UUIDString]];
+            stringByAppendingPathComponent:[@"clutch" stringByAppendingPathComponent:workingUUIDString]];
     }
 
     [[NSFileManager defaultManager] createDirectoryAtPath:workingPath
@@ -186,7 +188,7 @@
                                                attributes:nil
                                                     error:nil];
 
-    if (![[NSFileManager defaultManager] copyItemAtPath:[NSProcessInfo processInfo].arguments[0]
+    if (![[NSFileManager defaultManager] copyItemAtPath:[[NSProcessInfo processInfo].arguments objectAtIndex:0]
                                                  toPath:[workingPath stringByAppendingPathComponent:@"clutch"]
                                                   error:nil]) {
         KJPrint(@"Failed to copy clutch to %@", workingPath);
@@ -202,19 +204,28 @@
                                          withDestinationPath:self.originalBinary.frameworksPath
                                                        error:nil];
 
+	NSString* pagesString = [NSString stringWithFormat:@"%u", pages];
+	NSString* thinHeaderNCmdsString = [NSString stringWithFormat:@"%u", self.thinHeader.header.ncmds];
+	NSString* thinHeaderOffsetString = [NSString stringWithFormat:@"%u", self.thinHeader.offset];
+	NSString* directoryHashOffsetString = [NSString stringWithFormat:@"%u", CFSwapInt32(directory.hashOffset)];
+	NSString* beginString = [NSString stringWithFormat:@"%u", (unsigned int)begin];
+	NSString* cryptOffString = [NSString stringWithFormat:@"%u", crypt.cryptoff];
+	NSString* cryptSizeString = [NSString stringWithFormat:@"%u", crypt.cryptsize];
+	NSString* cryptlcOffsetString = [NSString stringWithFormat:@"%u", cryptlc_offset];
+
     const char *argv[] = {[workingPath stringByAppendingPathComponent:@"clutch"].UTF8String,
                           "-f",
                           swappedBinaryPath.UTF8String,
                           binaryDumpPath.UTF8String,
-                          [NSString stringWithFormat:@"%u", pages].UTF8String,
-                          [NSString stringWithFormat:@"%u", self.thinHeader.header.ncmds].UTF8String,
-                          [NSString stringWithFormat:@"%u", self.thinHeader.offset].UTF8String,
+                          pagesString.UTF8String,
+                          thinHeaderNCmdsString.UTF8String,
+                          thinHeaderOffsetString.UTF8String,
                           bundle.parentBundle.bundleIdentifier.UTF8String,
-                          [NSString stringWithFormat:@"%u", CFSwapInt32(directory.hashOffset)].UTF8String,
-                          [NSString stringWithFormat:@"%u", (unsigned int)begin].UTF8String,
-                          [NSString stringWithFormat:@"%u", crypt.cryptoff].UTF8String,
-                          [NSString stringWithFormat:@"%u", crypt.cryptsize].UTF8String,
-                          [NSString stringWithFormat:@"%u", cryptlc_offset].UTF8String,
+                          directoryHashOffsetString.UTF8String,
+                          beginString.UTF8String,
+                          cryptOffString.UTF8String,
+                          cryptSizeString.UTF8String,
+                          cryptlcOffsetString.UTF8String,
                           NULL};
 
     KJDebug(@"i must have called a thousand times!");

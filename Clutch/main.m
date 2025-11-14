@@ -54,17 +54,17 @@ int main(int argc, const char *argv[]) {
             return 0;
         }
 
-        if (SYSTEM_VERSION_LESS_THAN(NSFoundationVersionNumber_iOS_8_0)) {
+        /*if (SYSTEM_VERSION_LESS_THAN(NSFoundationVersionNumber_iOS_8_0)) {
             KJPrint(@"You need iOS 8.0+ to use Clutch %@", CLUTCH_VERSION);
             return 0;
-        }
+        }*/
 
         BOOL dumpedFramework = NO;
         BOOL successfullyDumpedFramework = NO;
         NSString *_selectedOption = @"";
         NSString *_selectedBundleID;
 
-        NSArray<NSString *> *arguments = [NSProcessInfo processInfo].arguments;
+        NSArray *arguments = [NSProcessInfo processInfo].arguments;
 
         ClutchCommands *commands = [[ClutchCommands alloc] initWithArguments:arguments];
 
@@ -99,23 +99,23 @@ int main(int argc, const char *argv[]) {
                         break;
                     }
                     case ClutchCommandOptionFrameworkDump: {
-                        NSArray<NSString *> *args = [NSProcessInfo processInfo].arguments;
+                        NSArray *args = [NSProcessInfo processInfo].arguments;
 
-                        if (([args[1] isEqualToString:@"--fmwk-dump"] || [args[1] isEqualToString:@"-f"]) &&
+                        if (([[args objectAtIndex:1] isEqualToString:@"--fmwk-dump"] || [[args objectAtIndex:1] isEqualToString:@"-f"]) &&
                             (args.count == 13)) {
                             FrameworkLoader *fmwk = [FrameworkLoader new];
 
-                            fmwk.binPath = args[2];
-                            fmwk.dumpPath = args[3];
-                            fmwk.pages = (uint32_t)[args[4] intValue];
-                            fmwk.ncmds = (uint32_t)[args[5] intValue];
-                            fmwk.offset = (uint32_t)[args[6] intValue];
-                            fmwk.bID = args[7];
-                            fmwk.hashOffset = (uint32_t)[args[8] intValue];
-                            fmwk.codesign_begin = (uint32_t)[args[9] intValue];
-                            fmwk.cryptsize = (uint32_t)[args[10] intValue];
-                            fmwk.cryptoff = (uint32_t)[args[11] intValue];
-                            fmwk.cryptlc_offset = (uint32_t)[args[12] intValue];
+                            fmwk.binPath = [args objectAtIndex:2];
+                            fmwk.dumpPath = [args objectAtIndex:3];
+                            fmwk.pages = (uint32_t)[[args objectAtIndex:4] intValue];
+                            fmwk.ncmds = (uint32_t)[[args objectAtIndex:5] intValue];
+                            fmwk.offset = (uint32_t)[[args objectAtIndex:6] intValue];
+                            fmwk.bID = [args objectAtIndex:7];
+                            fmwk.hashOffset = (uint32_t)[[args objectAtIndex:8] intValue];
+                            fmwk.codesign_begin = (uint32_t)[[args objectAtIndex:9] intValue];
+                            fmwk.cryptsize = (uint32_t)[[args objectAtIndex:10] intValue];
+                            fmwk.cryptoff = (uint32_t)[[args objectAtIndex:11] intValue];
+                            fmwk.cryptlc_offset = (uint32_t)[[args objectAtIndex:12] intValue];
                             fmwk.dumpSize = fmwk.cryptoff + fmwk.cryptsize;
 
                             BOOL result = successfullyDumpedFramework = [fmwk dumpBinary];
@@ -146,12 +146,12 @@ int main(int argc, const char *argv[]) {
 
                             if (!(key = (NSUInteger)selection.integerValue)) {
                                 KJDebug(@"using bundle identifier");
-                                if (_installedApps[selection] == nil) {
+                                if ([_installedApps objectForKey:selection] == nil) {
                                     KJPrint(@"Couldn't find installed app with bundle identifier: %@",
                                             _selectedBundleID);
                                     return 1;
                                 } else {
-                                    _selectedApp = _installedApps[selection];
+                                    _selectedApp = [_installedApps objectForKey:selection];
                                 }
                             } else {
                                 KJDebug(@"using number");
@@ -161,7 +161,7 @@ int main(int argc, const char *argv[]) {
                                     KJPrint(@"Couldn't find app with corresponding number!?!");
                                     return 1;
                                 }
-                                _selectedApp = _installedArray[key];
+                                _selectedApp = [_installedArray objectAtIndex:key];
                             }
 
                             if (!_selectedApp) {

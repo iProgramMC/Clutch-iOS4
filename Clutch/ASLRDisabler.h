@@ -5,6 +5,7 @@
 //  Created by Anton Titkov on 14.02.15.
 //
 //
+#include "Hack.h"
 
 #import <mach-o/fat.h>
 

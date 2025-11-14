@@ -62,19 +62,19 @@
 
             NSData *valData = [blobData subdataWithRange:NSMakeRange(blobData.currentOffset, _blobSize)];
 
-            if ([kvalues[name] isEqualToString:@"string"]) {
+            if ([[kvalues objectForKey:name] isEqualToString:@"string"]) {
                 NSString *val = [[NSString alloc] initWithData:valData encoding:NSASCIIStringEncoding];
-                _blob[name] = val;
-            } else if ([kvalues[name] isEqualToString:@"data"]) {
-                _blob[name] = valData;
-            } else if ([kvalues[name] isEqualToString:@"number"]) {
+                [_blob setObject:val forKey:name];
+            } else if ([[kvalues objectForKey:name] isEqualToString:@"data"]) {
+                [_blob setObject:valData forKey:name];
+            } else if ([[kvalues objectForKey:name] isEqualToString:@"number"]) {
                 uint32_t integer;
                 [valData getBytes:&integer length:sizeof(integer)];
-                _blob[name] = @(CFSwapInt32(integer));
+                [_blob setObject:@(CFSwapInt32(integer)) forKey:name];
             }
 
         } else if (name.length && [name isEqualToString:@"schi"]) {
-            _blob[name] = [self parseBlob:[blobData subdataWithRange:NSMakeRange(blobData.currentOffset, _blobSize)]];
+            [_blob setObject:[self parseBlob:[blobData subdataWithRange:NSMakeRange(blobData.currentOffset, _blobSize)]] forKey:name];
         } else if (name.length && [name isEqualToString:@"righ"]) {
 
             NSMutableDictionary *_righ = [NSMutableDictionary new];
@@ -92,13 +92,13 @@
                     name_ = [name_ substringWithRange:NSMakeRange(0, 4)];
                 }
 
-                if ([kvalues[name_] isEqualToString:@"number"] && name_.length) {
+                if ([[kvalues objectForKey:name_] isEqualToString:@"number"] && name_.length) {
 
-                    _righ[name_] = @(CFSwapInt32(kValue));
+                    [_righ setObject:@(CFSwapInt32(kValue)) forKey:name_];
                 }
             }
 
-            _blob[name] = _righ.copy;
+            [_blob setObject:_righ.copy forKey:name];
             continue;
         }
 
@@ -124,9 +124,9 @@
 
     [sinfData getBytes:&sinf length:sizeof(sinf)];
 
-    _sinfDict[@"size"] = @(realSize);
-    _sinfDict[@"name"] = @((const char *)&sinf.name);
-    _sinfDict[@"blob"] = [self parseBlob:[sinfData subdataWithRange:NSMakeRange(sizeof(struct sinf_kval), blobSize)]];
+    [_sinfDict setObject:@(realSize) forKey:@"size"];
+    [_sinfDict setObject:@((const char *)&sinf.name) forKey:@"name"];
+    [_sinfDict setObject:[self parseBlob:[sinfData subdataWithRange:NSMakeRange(sizeof(struct sinf_kval), blobSize)]] forKey:@"blob"];
 
     return _sinfDict.copy;
 }

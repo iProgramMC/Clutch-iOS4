@@ -25,17 +25,17 @@
 }
 
 - (nullable instancetype)initWithBundleInfo:(NSDictionary *)info {
-    NSURL *url = info[@"BundleURL"];
+    NSURL *url = [info objectForKey:@"BundleURL"];
     if (!url || [NSNull isEqual:url]) {
         return nil;
     }
 
     if ((self = [super initWithPath:url.path])) {
-        _bundleContainerURL = [info[@"BundleContainer"] copy];
+        _bundleContainerURL = [[info objectForKey:@"BundleContainer"] copy];
         if ([NSNull isEqual:_bundleContainerURL]) {
             return nil;
         }
-        _displayName = [info[@"DisplayName"] copy];
+        _displayName = [[info objectForKey:@"DisplayName"] copy];
         if ([NSNull isEqual:_displayName]) {
             return nil;
         }

@@ -26,7 +26,8 @@ set(SOURCE_DUMPERS
     Framework64Dumper.h
     Framework64Dumper.m
     FrameworkLoader.h
-    FrameworkLoader.m)
+    FrameworkLoader.m
+	UUIDGenerator.m)
 source_group("Dumpers" FILES ${SOURCE_DUMPERS})
 list(APPEND SOURCE_FILES ${SOURCE_DUMPERS})
 
@@ -106,9 +107,11 @@ list(APPEND SOURCE_FILES ${RESOURCE_SCRIPTS})
 configure_file(Clutch.entitlements Clutch.entitlements COPYONLY)
 configure_file(Info.plist.in Info.plist COPYONLY)
 
+add_subdirectory(zlib)
 add_subdirectory(MiniZip)
+add_subdirectory(ARCShim)
 
-add_executable(Clutch MACOSX_BUNDLE ${SOURCE_FILES} $<TARGET_OBJECTS:MiniZip>)
+add_executable(Clutch MACOSX_BUNDLE ${SOURCE_FILES} $<TARGET_OBJECTS:zlib> $<TARGET_OBJECTS:MiniZip> $<TARGET_OBJECTS:ARCShim>)
 addframework(Clutch Foundation)
 addframework(Clutch UIKit)
 addframework(Clutch MobileCoreServices)
@@ -166,7 +169,12 @@ add_custom_command(
   TARGET Clutch POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/build"
   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Clutch>
-          "${CMAKE_BINARY_DIR}/build/"
-  COMMAND codesign -fs-
-          --entitlements "${CMAKE_CURRENT_BINARY_DIR}/Clutch.entitlements"
-                         "${CMAKE_BINARY_DIR}/build/Clutch")
+          "${CMAKE_BINARY_DIR}/build/")
+#add_custom_command(
+#  TARGET Clutch POST_BUILD
+#  COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/build"
+#  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:Clutch>
+#          "${CMAKE_BINARY_DIR}/build/"
+#  COMMAND codesign -fs-
+#          --entitlements "${CMAKE_CURRENT_BINARY_DIR}/Clutch.entitlements"
+#                         "${CMAKE_BINARY_DIR}/build/Clutch")

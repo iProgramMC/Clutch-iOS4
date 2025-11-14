@@ -60,7 +60,7 @@ extern struct timeval gStart;
 
 - (void)start {
     // Always check for cancellation before launching the task.
-    if (self.cancelled) {
+    if ([self isCancelled]) {
         // Must move the operation to the finished state if it is canceled.
         [self willChangeValueForKey:@"isFinished"];
         _finished = YES;
@@ -68,7 +68,7 @@ extern struct timeval gStart;
         return;
     }
 
-    NSString __weak *bundleIdentifier = _application.bundleIdentifier;
+    NSString *__unsafe_unretained bundleIdentifier = _application.bundleIdentifier;
     self.completionBlock = ^{
         struct timeval end;
         gettimeofday(&end, NULL);
@@ -163,7 +163,7 @@ extern struct timeval gStart;
 
                 if (dict) {
                     for (NSString *key in dict.allKeys) {
-                        NSString *zipPath = dict[key];
+                        NSString *zipPath = [dict objectForKey:key];
                         [_archive addFileToZip:key newname:zipPath];
                         KJDebug(@"Added %@", zipPath);
                     }

@@ -5,7 +5,7 @@
 //  Created by Anton Titkov on 20.04.15.
 //
 //
-@import ObjectiveC.runtime;
+#import <objc/runtime.h> // @import ObjectiveC.runtime;
 
 #import "NSBundle+Clutch.h"
 
@@ -23,12 +23,13 @@ static NSString *_bID;
     [self didChangeValueForKey:@"clutchBID"];
 }
 
+// TODO: warning here
 - (NSString *)bundleIdentifier {
     if ([self.bundlePath isEqualToString:NSBundle.mainBundle.bundlePath]) {
         return self.clutchBID;
     }
 
-    return self.infoDictionary[(__bridge NSString *)kCFBundleIdentifierKey];
+    return [self.infoDictionary objectForKey:(__bridge NSString *)kCFBundleIdentifierKey];
 }
 
 @end

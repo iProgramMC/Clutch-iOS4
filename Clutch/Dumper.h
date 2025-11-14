@@ -5,7 +5,7 @@
 //  Created by Anton Titkov on 22.03.15.
 //
 //
-
+#include "Hack.h"
 #import "ASLRDisabler.h"
 #import "Binary.h"
 #import "BinaryDumpProtocol.h"
